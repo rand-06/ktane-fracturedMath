@@ -168,6 +168,7 @@ public class fracturedMath : MonoBehaviour
 			if (mode == 1) submittedNumerators = casted.ToList();
 			else if (mode == 2) submittedDenominators = casted.ToList();
 		}
+		refreshTexts();
 	}
 	
 	void Update()
@@ -189,7 +190,7 @@ public class fracturedMath : MonoBehaviour
 	private readonly string TwitchHelpMessage = "Use !{0} multiply / m to press multiplier button. " + 
 "Use !{0} read/nums/dens to change the mode. Use !{0} input# ## to input digits in the corresponding slot " +
 "(for example, !{0} input4 23 will input 23 in middle-left slot). Use !{0} inputall with 9 " +
-"numbers to fill the screen at once. Use !{0} reset to reset the input.";
+"numbers to fill the screen at once. Use !{0} reset to reset the input. Use !{0} submit to submit.";
 #pragma warning restore 414
 	
 	
@@ -200,6 +201,8 @@ public class fracturedMath : MonoBehaviour
 		yield return null;
 		switch (Command)
 		{
+			case "SUBMIT":
+				submitButton.OnInteract(); yield break;
 			case "MULTIPLY": case "M": multiplyButtonPress(); yield break;
 			case "RESET":
 			{
@@ -213,9 +216,11 @@ public class fracturedMath : MonoBehaviour
 			case "DENS":
 			{
 				int index = modeNames.IndexOf(Command);
-				for (int i = 0; i < (index - mode + 3) % 3; i++)
-				{
-					yield return null; pressState();}
+				mode = index;
+				if(selectedNumber!=-1) numbers[selectedNumber].color = Color.white;
+				selectedNumber = -1;
+				stateText.text = modeNames[mode];
+				refreshTexts();
 				yield break;
 			}
 			default:
